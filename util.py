@@ -1,4 +1,5 @@
 import FreeCAD as App
+from FreeCAD import Units
 from StartPage import StartPage
 from math import cos, sin
 import Mesh, Part, Sketcher
@@ -31,6 +32,9 @@ def boolu(obs,C):
     return
 
 def points_to_sketch(points,sketch,closed=True):
+    AAd = App.ActiveDocument
+    if closed:
+        points.append(points[0])
     pts = points
     sk = sketch
     n = len(pts)-1
@@ -69,3 +73,25 @@ def fcnew():
 
     AAd = App.ActiveDocument
     return AAd
+
+#"############################################################################"#
+def as_mm(v):
+    v = Units.Quantity('{}mm'.format(v))
+    return v
+
+#"############################################################################"#
+def filletz(gid,r):
+    AAd = App.ActiveDocument
+    AAd.getObject(gid).recompute()
+    gidf = gid+'_fl'
+    AAd.addObject("Part::Fillet",gidf)
+    AAd.getObject(gidf).Base = AAd.getObject(gid)
+    edg = AAd.getObject(gid).Shape.Edges
+    print('\n',gid,AAd.getObject(gid).Shape,'\n')
+    fl = {j:[ev.Point.z for ev in edg[j].Vertexes] for j in range(len(edg))}
+    fl = {j:abs(v[0]-v[1]) for j,v in fl.items() if abs(v[0]-v[1])>0.01}
+    print('\n',gid,fl,'\n')
+    __fillets__ = [(j+1,r,r) for j in fl.keys()]
+    AAd.getObject(gidf).Edges = __fillets__
+    AAd.getObject(gid).Visibility = False
+    return
