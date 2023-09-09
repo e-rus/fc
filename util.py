@@ -33,6 +33,7 @@ def boolu(obs,C):
 
 def points_to_sketch(points,sketch,closed=True):
     AAd = App.ActiveDocument
+    AAd.addObject('Sketcher::SketchObject',sketch)
     if closed:
         points.append(points[0])
     pts = points
