@@ -34,6 +34,25 @@ def boolu(obs,C):
 def points_to_sketch(points,sketch,closed=True):
     AAd = App.ActiveDocument
     AAd.addObject('Sketcher::SketchObject',sketch)
+    planecheck = [set([pt[j] for pt in points]) for j in [0,1,2]]
+    print(points,planecheck)
+    if planecheck[2]==set([0]):
+        rot = App.Rotation(0.000000, 0.000000, 0.000000, 1.000000)
+        plc = App.Placement(App.Vector(0.000000, 0.000000, 0.000000),rot)
+        points = [[pt[0],pt[1],0] for pt in points]
+    elif planecheck[1]==set([0]):
+        rot = App.Rotation(-0.707107, 0.000000, 0.000000, -0.707107)
+        plc = App.Placement(App.Vector(0.000000, 0.000000, 0.000000), rot)
+        points = [[pt[0],pt[2],0] for pt in points]
+    elif planecheck[0]==set([0]):
+        rot = App.Rotation(0.500000, 0.500000, 0.500000, 0.500000)
+        plc = App.Placement(App.Vector(0.000000, 0.000000, 0.000000), rot)
+        points = [[pt[1],pt[2],0] for pt in points]
+    else:
+        print("Out of planes")
+    AAd.getObject(sketch).Placement = plc
+    AAd.recompute()
+
     if closed:
         points.append(points[0])
     pts = points
@@ -63,8 +82,17 @@ def points_to_sketch(points,sketch,closed=True):
     if AAd.getObject(sk).ViewObject.TempoVis:
         AAd.getObject(sk).ViewObject.TempoVis.restore()
 
+#"############################################################################"#
+def revolution(gid,gidr,axis=(0,0,1),base=(1,0,0),angle=360,solid=True):
+    AAd = App.ActiveDocument
+    AAd.addObject("Part::Revolution",gidr)
+    AAd.getObject(gidr).Source = AAd.getObject(gid)
+    AAd.getObject(gidr).Angle = angle
+    AAd.getObject(gidr).Axis = axis
+    AAd.getObject(gidr).Base = base
+    AAd.getObject(gidr).Solid = True
 
-################################################################################
+#"############################################################################"#
 def fcnew():
     docs = App.listDocuments().keys()
     for doc in docs:
