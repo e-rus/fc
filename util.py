@@ -31,6 +31,21 @@ def boolu(obs,C):
         AAd.getObject(ob).Visibility=False
     return
 
+def booli(obs,C):
+    AAd = App.ActiveDocument
+
+    AAd.addObject("Part::MultiCommon",C)
+
+    obl = []
+    for ob in obs:
+        obl.append(AAd.getObject(ob))
+        
+    AAd.getObject(C).Shapes = obl
+
+    for ob in obs:
+        AAd.getObject(ob).Visibility=False
+    return
+
 def points_to_sketch(points,sketch,closed=True):
     AAd = App.ActiveDocument
     AAd.addObject('Sketcher::SketchObject',sketch)
@@ -95,4 +110,23 @@ def filletz(gid,r):
     __fillets__ = [(j+1,r,r) for j in fl.keys()]
     AAd.getObject(gidf).Edges = __fillets__
     AAd.getObject(gid).Visibility = False
+    return
+
+#"############################################################################"#
+
+def make_tube(r0,r1,h,gid):
+    AAd = App.ActiveDocument
+    gid0 = gid+'_00'
+    gid1 = gid+'_01'
+    
+    AAd.addObject("Part::Cylinder",gid0)
+    AAd.addObject("Part::Cylinder",gid1)
+
+    AAd.getObject(gid0).Radius = r0
+    AAd.getObject(gid1).Radius = r1
+
+    AAd.getObject(gid0).Height = h+0.1
+    AAd.getObject(gid1).Height = h
+
+    boold(gid1,gid0,gid)
     return
